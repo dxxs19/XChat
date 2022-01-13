@@ -1,0 +1,41 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+
+android {
+    compileSdkVersion CompileSdkVersion
+    buildToolsVersion BuildToolsVersion
+
+    defaultConfig {
+        minSdkVersion MinSdkVersion
+        targetSdkVersion TargetSdkVersion
+        versionCode VersionCode
+        versionName VersionName
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: "libs", include: ["*.jar"])
+    implementation kotlins.kotlin_stdlib
+    implementation androidx.core_ktx
+    implementation androidx.appcompat
+    testImplementation roots.junit
+    androidTestImplementation androidx.testJunit
+    androidTestImplementation androidx.testEspresso
+
+    // required, enough for most devices.
+    implementation ijkplayer.ijkplayer_java
+    implementation ijkplayer.ijkplayer_armv7a
+    // ExoPlayer as IMediaPlayer: optional, experimental
+    implementation ijkplayer.ijkplayer_exo
+}

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--指定Dialog的主题-->
+    <style name="Dialog.Light" parent="Theme.AppCompat.Light.Dialog">
+        <item name="colorAccent">@color/em_base_color_accent</item>
+    </style>
+</resources>

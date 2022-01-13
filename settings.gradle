@@ -1,0 +1,4 @@
+include ':libs:customView'
+include ':libs:player'
+include ':app', ":libs:permissionlib", ":libs:rx", ":libs:utils"
+rootProject.name = "XChat"

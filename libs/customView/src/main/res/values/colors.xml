@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="em_base_color_accent">@color/blue</color>
+
+    <color name="blue">#FF5A5DD0</color>
+</resources>

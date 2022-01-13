@@ -1,0 +1,148 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+
+android {
+    //加载资源
+    Properties properties = new Properties()
+    InputStream inputStream = project.rootProject.file('local.properties').newDataInputStream();
+    properties.load(inputStream)
+
+    compileSdkVersion CompileSdkVersion
+    buildToolsVersion BuildToolsVersion
+
+    defaultConfig {
+        applicationId "com.xwei.xchat"
+        minSdkVersion MinSdkVersion
+        targetSdkVersion TargetSdkVersion
+        versionCode 1
+        versionName "1.0"
+        multiDexEnabled true
+        //为了兼容5.0以下使用vector图标
+        vectorDrawables.useSupportLibrary = true
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        ndk {
+            abiFilters 'arm64-v8a', 'armeabi-v7a'//, 'x86', 'x86_64'
+        }
+
+        //指定room.schemaLocation生成的文件路径  处理Room 警告 Schema export Error
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = [
+                        "room.schemaLocation"  : "$projectDir/schemas".toString(),
+                        "room.incremental"     : "true",
+                        "room.expandProjection": "true"]
+            }
+        }
+
+        manifestPlaceholders = [EASEMOB_APPKEY       : properties.getProperty("EASEMOB_APPKEY", "******"),
+                                VIVO_PUSH_APPKEY     : properties.getProperty("VIVO_PUSH_APPKEY", "******"),
+                                VIVO_PUSH_APPID      : properties.getProperty("VIVO_PUSH_APPID", "******"),
+                                BAIDU_LOCATION_APPKEY: properties.getProperty("BAIDU_LOCATION_APPKEY", "******")
+        ]
+    }
+
+    // signingConfigs 一定要放在 buildTypes 前面
+    signingConfigs {
+        debug {
+            storeFile file(properties.getProperty('DEBUG_STORE_FILE_PATH', './keystore/wei.keystore.jks'))
+            storePassword properties.getProperty('DEBUG_STORE_PASSWORD', '123456')
+            keyAlias = properties.getProperty('DEBUG_KEY_ALIAS', 'xwei')
+            keyPassword properties.getProperty('DEBUG_KEY_PASSWORD', '123456')
+        }
+        release {
+            storeFile file(properties.getProperty('DEBUG_STORE_FILE_PATH', './keystore/wei.keystore.jks'))
+            storePassword properties.getProperty('DEBUG_STORE_PASSWORD', '123456')
+            keyAlias = properties.getProperty('DEBUG_KEY_ALIAS', 'xwei')
+            keyPassword properties.getProperty('DEBUG_KEY_PASSWORD', '123456')
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+
+        debug {
+            //applicationIdSuffix ".debug"
+            signingConfig signingConfigs.debug
+        }
+    }
+
+    //自3.6.0开始需要java8的支持，不加会报异常：[CIRCULAR REFERENCE:com.android.tools.r8.a:
+    // Default interface methods are only supported starting ....
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    lintOptions {
+        abortOnError false
+    }
+
+    packagingOptions {//加上这写代码
+        pickFirst 'lib/x86/libsqlite.so'
+        pickFirst 'lib/x86_64/libsqlite.so'
+        pickFirst 'lib/armeabi-v7a/libsqlite.so'
+        pickFirst 'lib/arm64-v8a/libsqlite.so'
+        pickFirst 'lib/x86/libhyphenate.so'
+        pickFirst 'lib/x86_64/libhyphenate.so'
+//        pickFirst 'lib/armeabi-v7a/libhyphenate.so'
+//        pickFirst 'lib/arm64-v8a/libhyphenate.so'
+
+//        pickFirst 'lib/x86/libcrypto.so'
+//        pickFirst 'lib/x86_64/libcrypto.so'
+//        pickFirst 'lib/armeabi-v7a/libcrypto.so'
+//        pickFirst 'lib/arm64-v8a/libcrypto.so'
+//
+//        pickFirst 'lib/x86/libssl.so'
+//        pickFirst 'lib/x86_64/libssl.so'
+//        pickFirst 'lib/armeabi-v7a/libssl.so'
+//        pickFirst 'lib/arm64-v8a/libssl.so'
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: "libs", include: ["*.jar"])
+    implementation kotlins.kotlin_stdlib
+    implementation androidx.core_ktx
+    implementation androidx.appcompat
+    testImplementation roots.junit
+    androidTestImplementation androidx.testJunit
+    androidTestImplementation androidx.testEspresso
+    implementation androidx.constraintlayout
+    implementation androidx.lifecycle_livedata_ktx
+
+    // EaseIMKit
+    implementation 'io.hyphenate:ease-im-kit:3.8.8'
+    // EaseIMKit依赖，必须添加环信IM SDK
+    implementation 'io.hyphenate:hyphenate-chat:3.8.8'
+    //EaseCallKit
+    implementation 'io.hyphenate:ease-call-kit:3.8.8'
+    // room
+    implementation "androidx.room:room-runtime:2.2.5"
+    annotationProcessor "androidx.room:room-compiler:2.2.5"
+    // parse
+    implementation 'com.parse:parse-android:1.13.1'
+    // bugly
+    implementation 'com.tencent.bugly:crashreport:2.6.6.1'
+    implementation 'com.tencent.bugly:nativecrashreport:3.3.1'
+
+    implementation files('libs/ZegoExpressEngine.jar')
+//    api project(':libs:giraffeplayer2')
+    implementation project(':libs:permissionlib')
+    implementation project(':libs:rx')
+    implementation project(':libs:utils')
+    implementation project(':libs:player')
+    implementation project(':libs:customView')
+}
+
+repositories {
+    mavenCentral()
+    flatDir {
+        dirs 'libs'
+    }
+}
